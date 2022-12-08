@@ -5,6 +5,6 @@ import Cache from "./src/cache";
 
 const app = new App({
     database: new LocalDatabase("./db.json"),
-    controller: Controller,
+    controller: new Controller(),
     cache: new Cache("./cache")
 })

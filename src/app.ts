@@ -1,24 +1,25 @@
-import { Server, createServer, RequestListener } from "node:http"
+import { Server } from "node:http"
+import { ControllerOptions } from "./controller";
 import { IDatabase, IController, ICache } from "./types";
 
 type AppOptions = {
     database: IDatabase,
-    controller: IController,
+    controller: IController<ControllerOptions>,
     cache: ICache
 }
 
 export class App {
     database: IDatabase 
-    controller: IController
+    controller: IController<ControllerOptions>
     cache: ICache
-    server: Server = new Server()
+    server: Server
 
     constructor({ database, controller, cache }: AppOptions){
         this.database = database
         this.controller = controller
         this.cache = cache
 
-        this.server = new Server(controller({
+        this.server = new Server(controller.unwrap({
             database: this.database, 
             cache: this.cache
         }))

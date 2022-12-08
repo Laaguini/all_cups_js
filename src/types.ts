@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from "node:http"
+import { IncomingMessage, ServerResponse, RequestListener } from "node:http"
 
 export type Nullable<T> = T | undefined | null
 
@@ -30,16 +30,36 @@ export type Email = {
 
 export type Comparator<T> = (e: T) => boolean
 
-export interface IDatabase {
-    take: (count: number, offset?: number) => Promise<Email[]>,
-    takeOne: (offset: number) => Promise<Nullable<Email>>,
-    find: (c: Comparator<Email>, limit?: number) => Promise<Email[]>,
-    findOne: (c: Comparator<Email>) => Promise<Nullable<Email>>,
+export type IDatabaseSearchRes<T> = {
+    values: T[],
+    fields: (fields: (keyof T)[]) => Promise<Partial<T>[]>
 }
+
+export interface IDatabase {
+    take: (count: number, offset?: number) => Promise<IDatabaseSearchRes<Email>>,
+    // takeOne: (offset: number) => Promise<Nullable<Email>>,
+    find: (c: Comparator<Email>, limit?: number) => Promise<IDatabaseSearchRes<Email>>,
+    // findOne: (c: Comparator<Email>) => Promise<Nullable<Email>>,
+}
+
+export type CacheableValue = Object | string
 
 export interface ICache {
-    get: (key: string) => Promise<any>,
-    set: (key: string, value: Object | string) => void
+    get: (key: string, reserveValue?: CacheableValue) => Promise<any>,
+    stream: (key: string, reserveValue?: CacheableValue) => Promise<ReadableStream>,
+    set: (key: string, value: CacheableValue) => void,
+    clear: (key: string) => void, 
 }
 
-export type IController = (options: any) => (req: IncomingMessage, res: ServerResponse) => void
+export type IControllerCtx = {
+    database: IDatabase,
+    cache: ICache, 
+}
+
+export type RouteHandler<T> = (ctx: T, req: IncomingMessage, res: ServerResponse) => string
+
+export interface IController<T> {
+    on: (path: string, handler: RouteHandler<T>) => void,
+    unwrap: (ctx: T) => RequestListener
+}
+

@@ -1,5 +1,6 @@
-import { ICache } from "./types"
-import { writeFile, readFile, access } from "node:fs/promises"
+import { CacheableValue, ICache } from "./types"
+import { createReadStream } from "node:fs"
+import { writeFile, readFile, access, unlink } from "node:fs/promises"
 import { join } from "node:path"
 
 //Делаю вид что у меня есть Redis 
@@ -10,15 +11,23 @@ class Cache implements ICache {
     constructor(dir: string) {
         this.dir = dir
     }
-
-    private async writeIfNotExists(path: string): Promise<void> {
-        await access(path).then().catch(async () => await writeFile(path, ""))
+    
+    private async exists(path: string): Promise<boolean> {
+        let flag = true
+        await access(path).then(() => flag = true).catch(() => flag = false)
+        return flag
     }
 
-    async get(key: string): Promise<any> {
+    private async setIfNotExists(key: string, reserveValue?: CacheableValue): Promise<void> {
         const path = join(this.dir, key)
 
-        await this.writeIfNotExists(path)
+        if(!await this.exists(path)) await this.set(key, reserveValue ?? "")
+    }
+
+    async get(key: string, reserveValue?: CacheableValue): Promise<any> {
+        const path = join(this.dir, key)
+
+        await this.setIfNotExists(key, reserveValue)
 
         const value = String(await readFile(path))
         
@@ -30,9 +39,22 @@ class Cache implements ICache {
         }
     }
 
+    async stream(key: string, reserveValue?: CacheableValue): Promise<any> {
+        const path = join(this.dir, key)
+
+        await this.setIfNotExists(key, reserveValue)
+
+        return createReadStream(path)
+    }
+
     async set(key: string, value: Object | string) {
         const path = join(this.dir, key)
         writeFile(path, typeof value === "string"? value : JSON.stringify(value))
+    }
+
+    async clear(key: string) {
+        const path = join(this.dir, key)
+        unlink(path)
     }
 }
 
