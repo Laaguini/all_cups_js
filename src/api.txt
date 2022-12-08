@@ -1,0 +1,3 @@
+/folders
+/folders/:folder
+/folders/:folder/:email
