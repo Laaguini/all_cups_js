@@ -1,6 +1,6 @@
 import { Server } from "node:http"
 import { ControllerCtx } from "./controller";
-import { IDatabase, IController, ICache } from "./types";
+import { IDatabase, IController, ICache } from "../types";
 
 type AppOptions = {
     database: IDatabase,

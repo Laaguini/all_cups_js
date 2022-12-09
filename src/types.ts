@@ -66,7 +66,7 @@ export type ReqWithParams = IncomingMessage & {
 }
 
 export type ExtendedRes = ServerResponse & {
-    json: (data: Object) => void 
+    json: (data: Object) => string 
 }
 
 export type RouteHandler<T> = (ctx: T, req: ExtendedReq & ReqWithParams, res: ExtendedRes) => Promise<string> | string

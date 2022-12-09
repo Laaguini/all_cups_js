@@ -1,7 +1,7 @@
-import { IController, IDatabase, ICache, RouteHandler, ExtendedRes, ExtendedReq, ReqWithParams } from "./types";
+import { IController, IDatabase, ICache, RouteHandler, ExtendedRes, ExtendedReq, ReqWithParams } from "../types";
 import { RequestListener, IncomingMessage, ServerResponse } from "http";
 import { parse as parseURL } from "node:url"
-import { zip } from "./utils";
+import { zip } from "../utils";
 
 type ControllerCtx = {
     database: IDatabase
@@ -18,7 +18,8 @@ class Controller implements IController<ControllerCtx> {
     routes: Route[] = []
 
     on(path: string, handler: RouteHandler<ControllerCtx>){
-        const pattern = new RegExp(path.replace(/(:[^\/]*)/g, "([^\/?]*)"))
+        const pattern = new RegExp(path.replace(/(:[^\/]*)/g, "([^\/?]*)") + '(\\?.*)?$')
+        
         const params = path.split("/").filter(e => e[0] === ":").map(e => e.slice(1))
 
         this.routes.push({
@@ -39,6 +40,7 @@ class Controller implements IController<ControllerCtx> {
                 if(!handlerRes) continue
 
                 res.write(await handlerRes)
+                break; // Захардкожено для возможности обрабатывать одновременно и роуты с параметрами и роуты с жестким URL
             }
 
             res.end()
@@ -50,9 +52,9 @@ class Controller implements IController<ControllerCtx> {
     private handle(ctx: ControllerCtx, req: ReturnType<typeof this.extendReq>, res: ReturnType<typeof this.extendRes>, route: Route) {
         const matches = route.pattern.exec(req.url ?? '')
 
-        if(!matches) return
+        if(!route.pattern.test(req.url as string)) return
 
-        const params = zip(route.params, matches.slice(1))
+        const params = zip(route.params, matches?.slice(1) || [])
         const extendedReq: ExtendedReq & ReqWithParams = Object.assign(req, { params }) 
 
         return route.handler(ctx, extendedReq, res)

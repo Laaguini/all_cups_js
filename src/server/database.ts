@@ -1,5 +1,5 @@
 import fs from "node:fs"
-import { Comparator, IDatabase, Email, Nullable, IDatabaseSearchRes } from "./types"
+import { Comparator, IDatabase, Email, Nullable, IDatabaseSearchRes } from "../types"
 
 class DatabaseSearchRes implements IDatabaseSearchRes<Email> {
     values: Email[]

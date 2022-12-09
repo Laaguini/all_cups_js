@@ -1,9 +1,7 @@
-import { CacheableValue, ICache } from "./types"
+import { CacheableValue, ICache } from "../types"
 import { createReadStream } from "node:fs"
 import { writeFile, readFile, access, unlink } from "node:fs/promises"
 import { join } from "node:path"
-
-//Делаю вид что у меня есть Redis 
 
 class Cache implements ICache {
     dir: string
@@ -26,8 +24,7 @@ class Cache implements ICache {
 
     async get(key: string, reserveValue?: CacheableValue): Promise<any> {
         const path = join(this.dir, key)
-
-        await this.setIfNotExists(key, reserveValue)
+        await this.setIfNotExists(key, typeof reserveValue === 'function'? await reserveValue() : reserveValue)
 
         const value = String(await readFile(path))
         
@@ -42,14 +39,14 @@ class Cache implements ICache {
     async stream(key: string, reserveValue?: CacheableValue): Promise<any> {
         const path = join(this.dir, key)
 
-        await this.setIfNotExists(key, reserveValue)
+        await this.setIfNotExists(key, typeof reserveValue === 'function'? await reserveValue() : reserveValue)
 
         return createReadStream(path)
     }
 
     async set(key: string, value: Object | string) {
         const path = join(this.dir, key)
-        writeFile(path, typeof value === "string"? value : JSON.stringify(value))
+        await writeFile(path, typeof value === "string"? value : JSON.stringify(value))
     }
 
     async clear(key: string) {
