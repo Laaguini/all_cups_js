@@ -1,16 +1,16 @@
 import { Server } from "node:http"
-import { ControllerOptions } from "./controller";
+import { ControllerCtx } from "./controller";
 import { IDatabase, IController, ICache } from "./types";
 
 type AppOptions = {
     database: IDatabase,
-    controller: IController<ControllerOptions>,
+    controller: IController<ControllerCtx>,
     cache: ICache
 }
 
 export class App {
     database: IDatabase 
-    controller: IController<ControllerOptions>
+    controller: IController<ControllerCtx>
     cache: ICache
     server: Server
 

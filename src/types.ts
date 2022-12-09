@@ -56,7 +56,20 @@ export type IControllerCtx = {
     cache: ICache, 
 }
 
-export type RouteHandler<T> = (ctx: T, req: IncomingMessage, res: ServerResponse) => string
+export type ExtendedReq = IncomingMessage & {
+    query: Record<string, Nullable<string | string[]>>,
+    pathname: Nullable<string>
+}
+
+export type ReqWithParams = IncomingMessage & {
+    params: Record<string, string>
+}
+
+export type ExtendedRes = ServerResponse & {
+    json: (data: Object) => void 
+}
+
+export type RouteHandler<T> = (ctx: T, req: ExtendedReq & ReqWithParams, res: ExtendedRes) => Promise<string> | string
 
 export interface IController<T> {
     on: (path: string, handler: RouteHandler<T>) => void,
