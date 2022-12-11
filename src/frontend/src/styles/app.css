@@ -1,0 +1,89 @@
+@import url("./fonts.css");
+
+.theme-light {
+	--page-bg: #F6F7F8;
+	--ui-bg: #fff; 
+	--ui-hover-bg: #00103D14;
+	--ui-active-bg: #00103D0A;
+	--ui-accent-bg: #fff;
+	--border-color: #00103D1F;
+	--text-main: #2C2D2E;
+	--text-secondary: #87898F;
+	--text-tertiary: #33333380;
+	--text-link: #005BD1;
+	--navbar-shadow:  0px 0px 16px rgba(2, 13, 41, 0.12);
+	--logo-color: #005FF9;
+	--indicator-off: #a5a7ad;
+	--indicator-on: #005FF9;
+	--bookmark-filled: #FC2C38;
+	color-scheme: light;
+}
+
+.theme-dark {
+	--page-bg: #19191A;
+	--ui-bg: #232324; 
+	--ui-hover-bg: #FFFFFF0A;
+	--ui-active-bg: #FFFFFF14;
+	--ui-accent-bg: #fff;
+	--border-color: #00000066;
+	--text-main: #E7E8EA;
+	--text-secondary: #8C8E94;
+	--text-tertiary: #e7e8ea80;
+	--text-link: #589BFF;
+	--navbar-shadow:  0px 0px 16px rgba(2, 13, 41, 0.16);
+	--logo-color: #FFF;
+	--indicator-off: #9C9DA2;
+	--indicator-on: #3C82FD;
+	--bookmark-filled: #FF4550;
+	color-scheme: dark;
+}
+
+:root {
+	font-size: 16px;
+	--text-lg: 1.5rem; 
+	--text-md: 0.9375rem; 
+	--text-sm: 0.8125rem;
+	--radius-lg: 0.75rem;
+	--radius-md: 0.5rem; 
+	--radius-sm: 0.25rem;
+	--font-button: "Mail Sans";
+	--font-control: "Arial";
+	--font-plaintext: "Helvetica Neue", "Helvetica";
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	font-family: Arial, Helvetica, sans-serif;
+	box-sizing: border-box;
+	transition: inherit;
+	font-size: inherit;
+	color: inherit;
+}
+
+svg {
+	transition: none;
+}
+
+html {
+	font-size: var(--text-md);
+	transition: all .4s ease-out 0s;
+	transition-property: color, background-color, box-shadow, border;
+}
+
+body {
+	background-color: var(--page-bg);
+	height: 100vh;
+}
+
+#app {
+	height: 100%;
+}
+
+button, input {
+	border: none;
+	background-color: transparent;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}

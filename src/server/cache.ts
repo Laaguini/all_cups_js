@@ -1,7 +1,10 @@
-import { CacheableValue, ICache } from "../types"
+import { CacheableValue, ICache } from "../types.js"
 import { createReadStream } from "node:fs"
 import { writeFile, readFile, access, unlink } from "node:fs/promises"
 import { join } from "node:path"
+
+// Хаха, я честно наивно предполагал, что эта штука будет быстрее чем тупо fild/map со всей огромной БД
+// На деле скорость падает в 20 раз :(
 
 class Cache implements ICache {
     dir: string

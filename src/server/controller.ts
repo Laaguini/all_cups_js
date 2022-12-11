@@ -1,7 +1,9 @@
 import { IController, IDatabase, ICache, RouteHandler, ExtendedRes, ExtendedReq, ReqWithParams } from "../types";
 import { RequestListener, IncomingMessage, ServerResponse } from "http";
 import { parse as parseURL } from "node:url"
-import { zip } from "../utils";
+import { zip } from "../utils.js";
+import stream from "node:stream"
+import { createReadStream } from "node:fs"
 
 type ControllerCtx = {
     database: IDatabase
@@ -31,6 +33,8 @@ class Controller implements IController<ControllerCtx> {
 
     unwrap(ctx: ControllerCtx){
         const listener: RequestListener = async (req, res) => {
+            res.setHeader("Access-Control-Allow-Origin", "*")
+
             const extendedReq = this.extendReq(req)
             const extendedRes = this.extendRes(res)
 
@@ -39,7 +43,12 @@ class Controller implements IController<ControllerCtx> {
 
                 if(!handlerRes) continue
 
-                res.write(await handlerRes)
+                try {
+                    res.write(await handlerRes)
+                }
+                catch(e) {
+                    res.write(String(await handlerRes))
+                }
                 break; // Захардкожено для возможности обрабатывать одновременно и роуты с параметрами и роуты с жестким URL
             }
 
@@ -68,7 +77,8 @@ class Controller implements IController<ControllerCtx> {
 
     private extendRes(res: ServerResponse): ExtendedRes {
         return Object.assign(res, {
-            json: (data: Object) => JSON.stringify(data)
+            json: (data: Object) => JSON.stringify(data),
+            file: (path: string) => createReadStream(path)
         })
     }
 }

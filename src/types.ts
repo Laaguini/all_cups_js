@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse, RequestListener } from "node:http"
+import { ReadStream } from "node:fs"
 
 export type Nullable<T> = T | undefined | null
 
@@ -66,10 +67,11 @@ export type ReqWithParams = IncomingMessage & {
 }
 
 export type ExtendedRes = ServerResponse & {
-    json: (data: Object) => string 
+    json: (data: Object) => string,
+    file: (path: string) => ReadStream
 }
 
-export type RouteHandler<T> = (ctx: T, req: ExtendedReq & ReqWithParams, res: ExtendedRes) => Promise<string> | string
+export type RouteHandler<T> = (ctx: T, req: ExtendedReq & ReqWithParams, res: ExtendedRes) => Promise<string | ReadStream | Buffer> | string | ReadStream
 
 export interface IController<T> {
     on: (path: string, handler: RouteHandler<T>) => void,
